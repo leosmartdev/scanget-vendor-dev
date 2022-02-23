@@ -1,0 +1,62 @@
+image: node:10.16.0
+options:
+  max-time: 30
+  size: 2x
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Deploy to test
+          deployment: test
+          script:
+            - apt-get -y update || true
+            - apt-get -y install python-dev
+            - apt-get -y install python-pip
+            - pip install --upgrade awscli
+            - npm install -g yarn
+            - rm -f package-lock.json
+            - yarn install
+            - export GENERATE_SOURCEMAP=true
+            - export CI=false
+            - npm run build
+            - aws s3 rm s3://client-test.scannget.com --recursive
+            - aws s3 sync ./build s3://client-test.scannget.com
+            - aws cloudfront create-invalidation --distribution-id E3AGZO5Z6PB3M1 --paths '/*'
+
+      - step:
+          name: Deploy to staging
+          trigger: manual
+          deployment: staging
+          script:
+            - apt-get -y update || true
+            - apt-get -y install python-dev
+            - apt-get -y install python-pip
+            - pip install --upgrade awscli
+            - npm install -g yarn
+            - rm -f package-lock.json
+            - yarn install
+            - export GENERATE_SOURCEMAP=true
+            - export CI=false
+            - npm run build
+            - aws s3 rm s3://client-stage.scannget.com --recursive
+            - aws s3 sync ./build s3://client-stage.scannget.com
+            - aws cloudfront create-invalidation --distribution-id E3BHOEMC2ZAWLL --paths '/*'
+
+      - step:
+          name: Deploy to production
+          trigger: manual
+          deployment: production
+          script:
+            - apt-get -y update || true
+            - apt-get -y install python-dev
+            - apt-get -y install python-pip
+            - pip install --upgrade awscli
+            - npm install -g yarn
+            - rm -f package-lock.json
+            - yarn install
+            - export GENERATE_SOURCEMAP=true
+            - export CI=false
+            - npm run build
+            - aws s3 rm s3://client.scannget.com --recursive
+            - aws s3 sync ./build s3://client.scannget.com
+            - aws cloudfront create-invalidation --distribution-id E32HS6LON8YOB4 --paths '/*'

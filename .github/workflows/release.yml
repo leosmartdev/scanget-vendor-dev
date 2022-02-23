@@ -1,0 +1,123 @@
+name: DEPLOY SNG VENDOR
+
+on:
+  push:
+    branches:
+      - release-test
+      - release-stage
+      - release-prod
+      - release-prod-hotfix
+
+jobs:
+  deploy-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variables
+        uses: allenevans/set-env@v1.0.0
+        with:
+          GENERATE_SOURCEMAP: true
+          SENTRY_ORG: sudofy
+          SENTRY_LOG_LEVEL: debug
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_PROJECT: "sng-vendor"
+          AWS_ACCESS_KEY_ID: AKIA4SUTOYRGBDIXKLWQ
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-1
+          SUDOFY_SSS_API_TOKEN: ${{ secrets.SUDOFY_SSS_API_TOKEN }}
+          JIRA_PROJECT: SNG
+          JIRA_VERSION_SUFFIX: "-vendor"
+
+      - name: Install Sentry CLI
+        run: curl -sL https://sentry.io/get-cli/ | bash
+
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Install awscli
+        run: pip install --upgrade awscli
+
+      - name: Install Nodejs12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.17.0
+
+      - name: Install NPM global packages (replace, yarn)
+        run: sudo npm i -g replace yarn
+
+      - name: Remove Package-lock
+        run: rm -f package-lock.json
+
+      - name: Protect package.json
+        run: mv package.json package.json.protected
+
+      - name: Install npm packages for github action
+        run: npm i @actions/core axios git-last-commit --no-optional
+
+      - name: UnProtect package.json
+        run: mv package.json.protected package.json
+
+      - name: Set custom environment variables
+        run: node .github/scripts/setupEnv.js
+
+      - name: create release in Sentry
+        run: sentry-cli releases new -p sng-vendor $SENTRY_RELEASE
+
+      - name: Push commits to Sentry
+        run: sentry-cli releases set-commits --auto $SENTRY_RELEASE
+
+      - name: Replace build number
+        run: replace 'sentry-sng-unreleased-app' "$SENTRY_RELEASE" src/index.js
+
+      - name: Replace build env
+        run: replace 'sentry-sng-env' "$SENTRY_ENVIRONMENT" src/index.js
+
+      - name: Remove node_modules
+        run: rm -rf node_modules
+
+      - name: Install local npm packages
+        run: sudo npm i
+
+      - name: Build
+        run: npm run build
+        env:
+          CI: "false"
+          GENERATE_SOURCEMAP: "true"
+
+      - name: Push Sourcemap to Sentry
+        run: sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps build/static/js/
+
+      - name: Delete Sourcemap from build
+        run: find build/static/js -name "*.map" -type f -delete
+
+      - name: Clean Bucket
+        run: aws s3 rm s3://$AWS_S3_APP --recursive
+
+      - name: Upload to S3 Bucket
+        run: aws s3 sync ./build s3://$AWS_S3_APP
+
+      - name: Invalidate Cloudfront
+        run: aws cloudfront create-invalidation --distribution-id $AWS_CF_ID --paths '/*'
+
+      - name: Remove node_modules
+        run: sudo rm -rf node_modules
+
+      - name: Protect package.json
+        run: mv package.json package.json.protected
+
+      - name: Install npm packages for github action
+        run: npm i @actions/core axios git-last-commit --no-optional
+
+      - name: Deploy release to Sentry
+        run: sentry-cli releases deploys $SENTRY_RELEASE new -e $SENTRY_ENVIRONMENT
+
+      - name: Deploy release to jira
+        run: node .github/scripts/releaseVersionOnJira.js
+
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.

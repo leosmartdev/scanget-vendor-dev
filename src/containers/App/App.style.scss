@@ -1,0 +1,138 @@
+@import "../../styles/fonts";
+// Main Root
+* {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+.reactRoot {
+  height: 100%;
+
+  .trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .trigger:hover {
+    color: #1890ff;
+  }
+
+  .logo {
+    height: 50px;
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    overflow: hidden;
+    img {
+      height: 55px;
+      width: 55px;
+      margin-right: 5px;
+    }
+    span {
+      font-family: $sourcesans;
+    }
+  }
+
+  .ant-layout-footer {
+    padding: 15px 50px;
+    color: rgb(128, 128, 128);
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+  }
+
+  .ant-layout-content {
+    margin-bottom: 1px !important;
+    height: 100%;
+    overflow: scroll;
+  }
+
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    font-size: 12px;
+  }
+
+  .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+    background: #797af5;
+  }
+  .ant-layout-sider {
+    background: #404040;
+  }
+
+  .ant-menu-dark,
+  .ant-menu-dark .ant-menu-sub {
+    background: #404040;
+  }
+
+  .ant-menu-vertical .ant-menu-item,
+  .ant-menu-vertical-left .ant-menu-item,
+  .ant-menu-vertical-right .ant-menu-item,
+  .ant-menu-inline .ant-menu-item,
+  .ant-menu-vertical .ant-menu-submenu-title,
+  .ant-menu-vertical-left .ant-menu-submenu-title,
+  .ant-menu-vertical-right .ant-menu-submenu-title,
+  .ant-menu-inline .ant-menu-submenu-title {
+    font-size: 13px;
+  }
+}
+.ant-btn-primary {
+  background: #797af5;
+  border: 1px solid #797af5;
+}
+
+.ant-tabs-nav .ant-tabs-tab {
+  color: #797af5;
+  &:hover {
+    color: #797af5;
+  }
+}
+.ant-tabs-ink-bar {
+  background-color: #797af5;
+}
+.reactRoot .ant-layout-sider,
+.reactRoot .ant-menu-dark {
+  background: #232323;
+}
+.ant-collapse-header {
+  white-space: pre-line;
+}
+.ant-calendar-today .ant-calendar-date {
+  border: none;
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: inherit;
+}
+.ant-calendar-selected-date .ant-calendar-date {
+  background: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 30px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(180, 180, 180);
+  border-radius: 30px;
+  height: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(160, 160, 160);
+}
+.modalImageContainer {
+  background: url("../../assets/images/noImage.gif") no-repeat center;
+  height: 400px;
+}
+.ant-select-selection-selected-value {
+  span {
+    white-space: nowrap !important;
+  }
+}

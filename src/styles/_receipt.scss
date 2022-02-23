@@ -1,0 +1,40 @@
+.modalImageContainer {
+  height: 400;
+  background-image: url("../assets/images/noImage.gif");
+  margin-bottom: 5px;
+}
+.items {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  margin-bottom: 5px;
+  background: #eee;
+}
+.receiptHeading {
+  font-weight: 500px;
+  font-size: 20px;
+  background-color: #eee;
+}
+.inputFieldsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.summaryItem {
+  background-color: #eee;
+  width: 25%;
+  font-size: 16px;
+}
+.itemList {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+}
+.receiptModalImage {
+  height: 100%;
+  width: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}

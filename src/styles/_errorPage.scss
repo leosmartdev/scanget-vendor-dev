@@ -1,0 +1,30 @@
+.ErrorPageContent {
+  color: grey;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  .ReportButton {
+    margin: 15px auto;
+    width: 120px;
+    height: 40px;
+    border-radius: 5px;
+    outline: none;
+    background: rgb(109, 109, 109);
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .ReportButton:hover {
+    transition: 0.3s;
+    background: transparent;
+    border: 2px solid rgb(109, 109, 109);
+    color: black;
+  }
+  p,
+  img {
+    margin: 10px auto;
+    font-size: 11pt;
+  }
+}
